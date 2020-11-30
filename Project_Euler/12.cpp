@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
-
+#include <assert.h>
+#include <vector>
 
 long triangleNumber(int index){
     long somaPA = ((index + 1) * index) / 2;
@@ -8,75 +9,93 @@ long triangleNumber(int index){
 }
 
 
-bool eprimo(long number, long* primos){
-    for(int i = 0; i < std::sqrt(number)+1; i++)
-        if (primos[i] != 0 && number % primos[i] == 0)
-            return false;
-    return true;
-}
-
-long* montaPrimos(long number){
-    long max = std::sqrt(number) + 1;
-    long* listaPrimos = new long[ (int)max];
-    listaPrimos[0] = 2;
-    listaPrimos[1] = 3;
-    long quantidadePrimos = 2;
-    for(int i =2;i < number; i++){
-
-        if(eprimo(i, listaPrimos)){
-            listaPrimos[quantidadePrimos] = i;
-            quantidadePrimos++;
-        }
+template <typename Number>
+Number maior_fator_primo(Number number){
+    Number candidate_prime = std::sqrt(number);
+    while(candidate_prime > 1){
+        if(number % candidate_prime == 0)
+            if(maior_fator_primo(candidate_prime) == 1)
+                return candidate_prime;
+        candidate_prime--;
     }
-    return listaPrimos;
+    return 1;
 }
 
+std::vector<long> primes {2,3};
 
-long* fatoracaoNumero(long number, long* primos){
-    long max = std::sqrt(number) + 1;
-    long* fatoracao = new long(max);
-    for(int i = 0; i < max;i++){
-        fatoracao[i] = 0;
-        while ( ((number != 1) && (primos[i] != 0)) && number % primos[i] == 0){
-            fatoracao[i]++;
-            number /= primos[i];
+std::vector<long> fators(long number){
+    auto i = primes.back() + 1;
+    while(primes.back() < number/2){
+        bool eprimo = true;
+        long max_p = sqrt(i);
+        for(auto j = 0; j < primes.size() && primes[j] < max_p; j++){
+            if(i % primes[j] == 0 && primes[j] < max_p){
+                eprimo = false;
+                break;
+            }
         }
+        if(eprimo)
+            primes.push_back(i);
+        i++;
     }
-    return fatoracao;
+    return primes;
 }
 
-long contaDivisores(long number,long* primos){
-    long quantidade =1;
-
-    if(eprimo(number, primos))
-        return 2;
-
-    long * numberFatorado = fatoracaoNumero(number, primos);
-    for(int i = 0; i < std::sqrt(number); i++){
-        if(numberFatorado[i] != 0){
-            quantidade *= (numberFatorado[i] + 1);
+int numberOfDivisor(long n){
+    auto p = maior_fator_primo<long>(n);
+    int sum = 2;
+    while(n > 1 && p > 1)
+    {
+        sum++;
+        while (n % p == 0){
+            n = n / p;
+            sum++;
         }
+        p = maior_fator_primo<long>(n);
     }
-    delete(numberFatorado);
-    return quantidade;
+    return sum;
 }
 
-long quantidadeDivisores(long number){
-    if (number == 1)
-        return 1;
-    if (number <= 3)
-        return 2;
-    long* primos = montaPrimos(number);
-    long resuldado = contaDivisores(number, primos);
-    delete(primos);
-    return resuldado;
+long fistNumberMoreDivisor(long max_divisor){
+    long candidate_divisor = 1;
+    long i = 1;
+    long number = triangleNumber(i);
+    while (candidate_divisor < max_divisor)
+    {
+        number = triangleNumber(i);
+        candidate_divisor = numberOfDivisor(number);
+        i++;
+    }
+    return number;
 }
 
 int main(){
-    const int aux = 10;
-    long* primos = montaPrimos(aux);
-    for(int i =0; i < aux; i++)
-        std::cout << primos[i] << "\n";
-    delete(primos);
+    // testes();
+    // std::cout << fistNumberMoreDivisor(500)  << "\n";
+    fators(28);
+    for( auto p: primes){
+        std::cout << " p= " << p << "\n";
+    }
     return 0;
+}
+
+void test_triangleNumber(){
+    int lista[] = {1, 3, 6, 10, 15, 21, 28, 36, 45, 55};
+    for(int i = 1; i <= 10;i++){
+        assert(triangleNumber(i) == lista[i-1]);
+    }
+}
+
+void test_numberOfDivisor(){
+    assert(numberOfDivisor(28) == 5);
+}
+
+void test_fistNumberMoreDivisor(){
+    assert(fistNumberMoreDivisor(5) == 28);
+} 
+
+void testes(){
+    test_triangleNumber();
+    test_fistNumberMoreDivisor();
+    test_numberOfDivisor();
 }
