@@ -21,13 +21,15 @@ Number maior_fator_primo(Number number){
     return 1;
 }
 
-std::vector<long> primes {2,3};
+static std::vector<long> primes {2,3};
 
-void fators(long number){
+void get_primes(long number){
     auto i = primes.back() + 1;
+    bool eprimo;
+    long max_p;
     while(primes.back() < number/2){
-        bool eprimo = true;
-        long max_p = sqrt(i)+1;
+        eprimo = true;
+        max_p = sqrt(i)+1;
         for(auto j = 0; j < primes.size() && primes[j] < max_p; j++){
             if(i % primes[j] == 0 ){
                 eprimo = false;
@@ -38,6 +40,19 @@ void fators(long number){
             primes.push_back(i);
         i++;
     }
+}
+
+std::vector<int> factorization(long number){
+    get_primes(number);
+    std::vector<int> factors (number/2) ;
+    for(auto i = 0; i < factors.size(); i++){
+        while (number > 1 && number % primes[i] ==0)
+        {
+            factors[i]++;
+            number /= primes[i];
+        }   
+    }
+    return factors;
 }
 
 int numberOfDivisor(long n){
@@ -84,7 +99,7 @@ void test_fistNumberMoreDivisor(){
 } 
 
 void test_primes(){
-    fators(28);
+    get_primes(28);
     assert( primes[0] == 2);
     assert( primes[1] == 3);
     assert( primes[2] == 5);
@@ -93,11 +108,20 @@ void test_primes(){
     assert( primes[5] == 13);
 }
 
+void test_factorization(){
+    auto f = factorization(28);
+    assert( f[0] == 2);
+    assert( f[1] == 0);
+    assert( f[2] == 0);
+    assert( f[3] == 1);
+}
+
 void testes(){
     test_triangleNumber();
     test_fistNumberMoreDivisor();
     test_numberOfDivisor();
     test_primes();
+    test_factorization();
 }
 
 int main(){
