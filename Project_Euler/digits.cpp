@@ -16,6 +16,8 @@ public:
   void print(long);
   Digits operator+(const Digits&);
   bool operator<(const Digits&);
+  bool operator==(const Digits&);
+  long sum_digits();
 };
 
 template <typename Number>
@@ -125,4 +127,21 @@ void Digits::print(long rest){
   for(auto i = signficant-1; i >= signficant-rest; i--){
     std::cout << digits[i];
   }
+}
+
+bool Digits::operator==(const Digits& d){
+  if(this->signficant != d.signficant)
+    return false;
+  for(long i = 0; i < signficant; i++)
+    if(this->digits[i] != d.digits[i])
+      return false;
+  return true;
+}
+
+long Digits::sum_digits(){
+  long sum = 0;
+  for(long i = 0; i < signficant; i++){
+    sum += digits[i];
+  }
+  return sum;
 }
