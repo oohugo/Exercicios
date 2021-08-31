@@ -25,7 +25,7 @@ fn fibonacci_index(digitis: u64) -> u64 {
     let mut f2 = BigNumber::new(1);
     let mut index = 2;
     while f1.n.len() < digitis as usize && f2.n.len() < digitis as usize {
-        let aux = sum_big(f1, f2.clone());
+        let aux = sum_big(&f1, &f2);
         f1 = f2.clone();
         f2 = aux;
         index += 1;
@@ -33,7 +33,7 @@ fn fibonacci_index(digitis: u64) -> u64 {
     index
 }
 
-fn sum_big(number_a: BigNumber, number_b: BigNumber) -> BigNumber {
+fn sum_big(number_a: &BigNumber, number_b: &BigNumber) -> BigNumber {
     let min = if number_a.n.len() > number_b.n.len() {
         number_b.n.len()
     } else {
@@ -52,9 +52,9 @@ fn sum_big(number_a: BigNumber, number_b: BigNumber) -> BigNumber {
         n.push(sum);
     }
     let aux = if min < number_a.n.len() {
-        number_a.n
+        &number_a.n
     } else {
-        number_b.n
+        &number_b.n
     };
     for i in aux.iter().skip(min) {
         let mut sum = i + carry;
@@ -87,19 +87,19 @@ mod tests {
     fn add_big() {
         let a = BigNumber::new(999);
         let b = BigNumber::new(222);
-        assert_eq!(sum_big(a, b).n, [1, 2, 2, 1]);
+        assert_eq!(sum_big(&a, &b).n, [1, 2, 2, 1]);
         let a = BigNumber::new(999);
         let b = BigNumber::new(222222);
         let result = BigNumber::new(223221);
-        assert_eq!(sum_big(a, b).n, result.n);
+        assert_eq!(sum_big(&a, &b).n, result.n);
         let a = BigNumber::new(9999);
         let b = BigNumber::new(1);
         let result = BigNumber::new(10000);
-        assert_eq!(sum_big(a, b).n, result.n);
+        assert_eq!(sum_big(&a, &b).n, result.n);
         let a = BigNumber::new(233);
         let b = BigNumber::new(377);
         let result = BigNumber::new(610);
-        assert_eq!(sum_big(a, b).n, result.n);
+        assert_eq!(sum_big(&a, &b).n, result.n);
     }
 
     #[test]
